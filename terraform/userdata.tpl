@@ -1,6 +1,6 @@
 #!/bin/bash
 
-hostnamectl set-hostname vault
+hostnamectl set-hostname "${hostname}"
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -26,21 +26,18 @@ apt-get install -y \
   vault \
   vim-nox 
 
-pip install --upgrade pip
-pip install -q boto3 hvac bpytop
-
+sudo -u ubuntu bash -c 'pip install --upgrade pip; pip install -q boto3 hvac bpytop'
 
 # add environment
-HM=/home/ubuntu
-cd $HM
+cd /home/ubuntu
 git clone https://github.com/jacobm3/gbin.git
 chmod +x gbin/*
 
-echo '. ~/gbin/jacobrc'  >> ${HM}/.bashrc
+echo '. ~/gbin/jacobrc'  >> .bashrc
 ln -s gbin/jacobrc .jacobrc
 
-sudo chown -R ubuntu:ubuntu $HM
+sudo chown -R ubuntu:ubuntu /home/ubuntu
 
-cd ${HM}/gbin && sudo cp pg ng /usr/local/bin
+cd /home/ubuntu/gbin && cp pg ng /usr/local/bin
 
 ./vim.sh 

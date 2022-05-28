@@ -4,6 +4,8 @@ data "aws_ami" "latest-ubuntu" {
 
   filter {
     name = "name"
+    #values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    #values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"]
     #values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
     values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
   }
@@ -25,18 +27,24 @@ resource "aws_instance" "vault" {
   # m6a.large; 2 vcpu, 8GB ram, ebs = $2.07/day
   # c6a.xlarge: 4 vcpu, 8GB ram, ebs = $3.67/day
 
-  instance_type   = "t4g.nano"
-  key_name        = "acer-wsl"
-  user_data       = file("userdata.sh")
-  security_groups = [aws_security_group.vault.name]
-  lifecycle {
-    ignore_changes = [user_data, tags]
-  }
-  tags = {
-    Name = "vault"
-  }
-}
+  instance_type = "t4g.nano"
+  key_name      = var.key_name
 
+  security_groups = [aws_security_group.vault.name]
+
+  lifecycle {
+    ignore_changes = [user_data, ami]
+  }
+
+  tags = {
+    Name = var.hostname
+  }
+
+  user_data = templatefile("userdata.tpl", {
+    hostname = var.hostname
+  })
+
+}
 
 resource "aws_security_group" "vault" {
   name        = "vault.t4g"
