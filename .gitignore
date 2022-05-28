@@ -66,3 +66,4 @@ override.tf.json
 __pycache__
 
 
+.terraform.lock.hcl 
