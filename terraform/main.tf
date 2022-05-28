@@ -19,8 +19,10 @@ data "aws_ami" "latest-ubuntu" {
 resource "aws_instance" "vault" {
   ami = data.aws_ami.latest-ubuntu.id
 
+  # arm64
   # t4g.nano: 2vpu, 512MB ram, ebs = $0.0042/hr = $0.10/day = $3/month
 
+  # amd64
   # t3a.large; 2 vcpu, 8GB ram, ebs = $1.80/day
   # m5d.large; 2 vcpu, 8GB ram, nvme = $2.70/day
   # m5d.xlarge; 4 vcpu, 16GB ram, nvme = $5.42/day
