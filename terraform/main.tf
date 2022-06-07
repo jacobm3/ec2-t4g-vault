@@ -29,7 +29,8 @@ resource "aws_instance" "vault" {
   # m6a.large; 2 vcpu, 8GB ram, ebs = $2.07/day
   # c6a.xlarge: 4 vcpu, 8GB ram, ebs = $3.67/day
 
-  instance_type = "t4g.nano"
+  #instance_type = "t4g.nano"
+  instance_type = var.instance_type
   key_name      = var.key_name
 
   security_groups = [aws_security_group.vault.name]
@@ -49,7 +50,7 @@ resource "aws_instance" "vault" {
 }
 
 resource "aws_security_group" "vault" {
-  name        = "vault.t4g"
+  name        = var.hostname
   description = "Allow vault inbound traffic"
   vpc_id      = var.vpc_id
 
