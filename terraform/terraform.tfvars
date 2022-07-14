@@ -1,5 +1,5 @@
 vpc_id   = "vpc-4f778c2a"
-hostname = "k3s"
+hostname = "consul"
 key_name = "acer-wsl"
-instance_type = "t4g.micro"
+instance_type = "t3.micro"
 

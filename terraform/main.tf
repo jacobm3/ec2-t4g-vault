@@ -6,8 +6,8 @@ data "aws_ami" "latest-ubuntu" {
     name = "name"
     #values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
     #values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-arm64-server-*"]
-    #values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+    #values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
   }
 
   filter {
@@ -16,42 +16,69 @@ data "aws_ami" "latest-ubuntu" {
   }
 }
 
-resource "aws_instance" "vault" {
+resource "aws_instance" "consul1" {
   ami = data.aws_ami.latest-ubuntu.id
-
-  # arm64
-  # t4g.nano: 2vpu, 512MB ram, ebs = $0.0042/hr = $0.10/day = $3/month
-
-  # amd64
-  # t3a.large; 2 vcpu, 8GB ram, ebs = $1.80/day
-  # m5d.large; 2 vcpu, 8GB ram, nvme = $2.70/day
-  # m5d.xlarge; 4 vcpu, 16GB ram, nvme = $5.42/day
-  # m6a.large; 2 vcpu, 8GB ram, ebs = $2.07/day
-  # c6a.xlarge: 4 vcpu, 8GB ram, ebs = $3.67/day
-
-  #instance_type = "t4g.nano"
   instance_type = var.instance_type
   key_name      = var.key_name
 
-  security_groups = [aws_security_group.vault.name]
+  security_groups = [aws_security_group.consul.name]
 
   lifecycle {
     ignore_changes = [user_data, ami]
   }
 
   tags = {
-    Name = var.hostname
+    Name = "consul1"
   }
 
   user_data = templatefile("userdata.tpl", {
     hostname = var.hostname
   })
-
 }
 
-resource "aws_security_group" "vault" {
+resource "aws_instance" "consul2" {
+  ami = data.aws_ami.latest-ubuntu.id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+
+  security_groups = [aws_security_group.consul.name]
+
+  lifecycle {
+    ignore_changes = [user_data, ami]
+  }
+
+  tags = {
+    Name = "consul2"
+  }
+
+  user_data = templatefile("userdata.tpl", {
+    hostname = var.hostname
+  })
+}
+
+resource "aws_instance" "consul3" {
+  ami = data.aws_ami.latest-ubuntu.id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+
+  security_groups = [aws_security_group.consul.name]
+
+  lifecycle {
+    ignore_changes = [user_data, ami]
+  }
+
+  tags = {
+    Name = "consul3"
+  }
+
+  user_data = templatefile("userdata.tpl", {
+    hostname = var.hostname
+  })
+}
+
+resource "aws_security_group" "consul" {
   name        = var.hostname
-  description = "Allow vault inbound traffic"
+  description = "Allow consul inbound traffic"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -63,7 +90,7 @@ resource "aws_security_group" "vault" {
   }
 
   ingress {
-    description = "vault"
+    description = "consul"
     from_port   = 8200
     to_port     = 8200
     protocol    = "tcp"
@@ -80,6 +107,6 @@ resource "aws_security_group" "vault" {
   }
 
   tags = {
-    Name = "vault"
+    Name = "consul"
   }
 }
